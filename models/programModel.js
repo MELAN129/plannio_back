@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("./dbConfig");
 
-const User = sequelize.define("User", {
+const Program = sequelize.define("Program", {
   id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
@@ -11,10 +11,14 @@ const User = sequelize.define("User", {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  role: {
+  // recurrence: {
+  //   type: DataTypes.INTEGER,
+  //   allowNull: false,
+  // },
+  fields: {
     type: DataTypes.STRING,
     allowNull: false,
   },
 });
 
-module.exports = User;
+module.exports = Program;

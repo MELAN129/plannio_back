@@ -1,51 +1,56 @@
 const express = require("express");
 const router = express.Router();
-const Group = require("../models/groupsModel.js");
+const { Group, User } = require("../models/index.js");
 
-const newName = "yo";
-
-router.get("/", (req, res) => {
-  res.status(200);
-  Group.findAll().then((data) => res.send(data));
+router.get("/", async (req, res) => {
+  try {
+    const data = await Group.findAll();
+    res.status(200);
+    res.send(data);
+  } catch (err) {
+    res.status(500);
+    res.send("Oups");
+    console.log(err);
+  }
 });
 
-router.get("/:groupId", (req, res) => {
-  const id = req.params.groupId;
-  const group = Group.findByPk(+id)
-    .then((group) => {
-      if (group) {
-        res.status(200);
-        res.json(group);
-      } else {
-        res.status(404);
-        res.send("Not found, sorry =(");
-      }
-    })
-    .catch((err) => {
-      res.status(400);
-      console.log(err);
-    });
-});
-
-router.post("/", (req, res) => {
-  const group = Group.create({
-    name: req.body.name,
-  })
-    .then(() => {
+router.get("/:groupId", async (req, res) => {
+  try {
+    const id = req.params.groupId;
+    const group = await Group.findByPk(+id);
+    if (group) {
       res.status(200);
-      res.send();
-    })
-    .catch(() => {
-      res.status(500);
-      res.send();
+      res.json(group);
+    } else {
+      res.status(404);
+      res.send("Not found, sorry =(");
+    }
+  } catch (err) {
+    res.status(500);
+    res.send("Something happened =/");
+    console.log(err);
+  }
+});
+
+router.post("/", async (req, res) => {
+  try {
+    const group = await Group.create({
+      name: req.body.name,
+      description: req.body.description,
+      head: req.body.head,
     });
+    res.status(200);
+    res.send();
+  } catch (err) {
+    res.status(500);
+    res.send(err);
+  }
 });
 
 router.delete("/:groupId", async (req, res) => {
   try {
     const id = req.params.groupId;
     const group = await Group.findByPk(+id);
-
     if (group) {
       await group.destroy();
       res.status(200);
@@ -55,7 +60,7 @@ router.delete("/:groupId", async (req, res) => {
       res.send("Not found, sorry =(");
     }
   } catch (err) {
-    res.status(400);
+    res.status(500);
     console.log(err);
   }
 });
@@ -75,7 +80,50 @@ router.patch("/:groupId", async (req, res) => {
       res.send("Not found, sorry =(");
     }
   } catch (err) {
-    res.status(400);
+    res.status(500);
+    console.log(err);
+  }
+});
+
+// Add a user to a group
+
+router.post("/:groupId/users", async (req, res) => {
+  try {
+    const groupId = req.params.groupId;
+    const userId = req.body.id;
+    const group = await Group.findByPk(+groupId);
+    const user = await User.findByPk(+userId);
+    if (group && user) {
+      await group.addUser(user, { through: "User_Groups" });
+      console.log("ok");
+      res.status(200);
+      res.send("Updating successfully");
+    } else {
+      res.status(404);
+      res.send("Not found, sorry =(");
+    }
+  } catch (err) {
+    res.status(500);
+    console.log(err);
+  }
+});
+
+// Get users from a specific group
+
+router.get("/:groupId/users", async (req, res) => {
+  try {
+    const groupId = req.params.groupId;
+    const group = await Group.findByPk(groupId);
+    const users = await group.getUsers();
+    console.log(users);
+    // await User_Groups.findAll({
+    //   groupId: groupId,
+    // });
+    res.status(200);
+    res.json(users);
+  } catch (err) {
+    res.status(500);
+    res.send("Oups");
     console.log(err);
   }
 });

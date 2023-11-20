@@ -7,6 +7,7 @@ require("./models/dbConfig");
 // const bodyParser = require("body-parser");
 const userRoutes = require("./routes/users");
 const groupRoutes = require("./routes/groups");
+const programRoutes = require("./routes/programs");
 // const cors = require("cors");
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
@@ -25,6 +26,7 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use("/users", userRoutes);
 app.use("/groups", groupRoutes);
+app.use("/programs", programRoutes);
 // app.use(cors());
 
 app.listen(5500, () => {
