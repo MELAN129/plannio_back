@@ -6,7 +6,7 @@ const sequelize = new Sequelize(
 
 sequelize
   .authenticate()
-  .then(() => console.log("Yo B-)"))
-  .catch(() => console.log("bah ?"));
+  .then(() => console.log("Connected to the DB"))
+  .catch(() => console.log("Error while connecting to the DB"));
 
 module.exports = sequelize;
